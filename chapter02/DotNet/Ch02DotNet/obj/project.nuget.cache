@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TTBFxsM8IwjS0Uglk59n0zZboi8lUVN9/nv94t/fZHQYTT4L1tf6Kdim2cejU9WXC6yYJfNRNlu9VGboua0f/A==",
+  "dgSpecHash": "qD65M5dJplIEWkvtXubNjAJBLoJ9AyUSl13UgPMreCSapBzs0X3zBm7ZZMRMinKoorsqVj3P5E8EpSwIPhuqpQ==",
   "success": true,
-  "projectFilePath": "d:\\_repo\\github\\ericgutt10\\my-bootstrapping-microservices-v2\\chapter02\\DotNet\\Ch02DotNet\\Ch02DotNet.csproj",
+  "projectFilePath": "D:\\_repo\\github\\ericgutt10\\my-bootstrapping-microservices-v2\\chapter02\\DotNet\\Ch02DotNet\\Ch02DotNet.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ericg\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.0\\microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
     "C:\\Users\\ericg\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
