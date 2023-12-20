@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "module": "NodeNext",
+    "target": "ESNext",
+    "allowJs": true
+  },
+  "files": ["src/server.js"]
+}
