@@ -1,6 +1,0 @@
-@Ch02DotNet_HostAddress = http://localhost:5023
-
-GET {{Ch02DotNet_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
