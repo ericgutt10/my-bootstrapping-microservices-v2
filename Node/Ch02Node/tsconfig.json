@@ -6,5 +6,5 @@
     "target": "ESNext",
     "allowJs": true
   },
-  "files": ["src/server.js"]
+  "files": ["src/index.js"]
 }
