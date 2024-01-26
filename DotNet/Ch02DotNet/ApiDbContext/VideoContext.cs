@@ -14,7 +14,7 @@ public class VideoContext(DbContextOptions<VideoContext> options) : DbContext(op
             new Video("Sample")
             {
                 Id = Guid.Parse("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
-                Path = @"videos\d28888e9-2ba9-473a-a40f-e38cb54f9b35\SampleVideo_1280x720_1mb.mp4"
+                Path = @"videos\0\SampleVideo_1280x720_1mb.mp4"
             }
             );
 

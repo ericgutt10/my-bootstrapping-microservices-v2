@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace ApiHost.Lib;
+namespace ApiSharedLib.Lib;
 
 public static class VideoStream
 {

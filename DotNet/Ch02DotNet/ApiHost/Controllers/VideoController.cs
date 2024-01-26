@@ -1,46 +1,33 @@
-using ApiHost.Entities;
-using ApiHost.Lib;
-using ApiHost.Services;
-using Microsoft.AspNetCore.Http;
+using ApiSharedLib;
+using ApiSharedLib.VideoRequests;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace ApiHost.Controllers
 {
     [Route("api/videos")]
     [ApiController]
-    public class VideoController : ControllerBase
+    public class VideoController(
+        IMediator mediator,
+        IHostEnvironment env
+            ) : ControllerBase
     {
-        public VideoController(IVideoServiceRepository videoServiceRepository, IHostEnvironment env)
-        {
-            VideoServiceRepository = videoServiceRepository;
-            Env = env;
-        }
+        public IMediator Mediator { get; } = mediator;
+        public IHostEnvironment Env { get; } = env;
 
-        public IVideoServiceRepository VideoServiceRepository { get; }
-        public IHostEnvironment Env { get; }
-
-        [HttpGet("{videoId}", Name = "GetVideo")]
+        [HttpGet("{videoId}")]
         public async Task<ActionResult> GetVideo(Guid videoId)
         {
-            // get author from repo
-            var videoFromRepo = await VideoServiceRepository.GetVideoAsync(videoId);
+            return await Mediator.Send(
+                new VideoRequest(videoId, Env.ContentRootPath));
+        }
 
-            if (videoFromRepo != null)
-            {
-                var path = Path.Combine(
-                    Env.ContentRootPath,
-                    videoFromRepo.Path!
-                    );
-
-                if (new FileInfo(path).Exists)
-                {
-                    var inputStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-
-                    return new VideoStreamResult(inputStream, "video/mp4");
-                }
-            }
-
-            return NotFound();
+        [HttpGet]
+        public async Task<IEnumerable<VideoDto>> GetVideos()
+        {
+            return await Mediator.Send(
+                new VideosRequest());
         }
     }
 }
