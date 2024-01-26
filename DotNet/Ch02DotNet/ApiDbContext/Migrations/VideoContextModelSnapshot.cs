@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ApiHost.Migrations
+namespace ApiDbContext.Migrations
 {
     [DbContext(typeof(VideoContext))]
     partial class VideoContextModelSnapshot : ModelSnapshot
@@ -40,7 +40,7 @@ namespace ApiHost.Migrations
                         new
                         {
                             Id = new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
-                            Path = "videos\\d28888e9-2ba9-473a-a40f-e38cb54f9b35\\SampleVideo_1280x720_1mb.mp4",
+                            Path = "videos\\0\\SampleVideo_1280x720_1mb.mp4",
                             Title = "Sample"
                         });
                 });

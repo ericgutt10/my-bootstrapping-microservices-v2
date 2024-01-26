@@ -1,93 +1,92 @@
-﻿using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace ApiHost.Lib;
+
+namespace ApiSharedLib.Lib;
 
 /// <summary>
 /// https://stackoverflow.com/questions/34047247/how-to-stream-a-video-or-a-file-considering-request-and-response-range-headers
 /// </summary>
-public class VideoStreamResult : FileStreamResult
+public class VideoStreamResult(Stream fileStream, string contentType) : FileStreamResult(fileStream, contentType)
 {
     private const int BufferSize = 0x1000;
 
-    private string MultipartBoundary = "<qwe123>";
+    private readonly string MultipartBoundary = "<qwe123>";
 
-    public VideoStreamResult(Stream fileStream, string contentType) : base(fileStream, contentType)
-    {
-        EnableRangeProcessing = true;
-    }
-
-    private bool IsMultipartRequest(RangeHeaderValue? range)
+    private static bool IsMultipartRequest(RangeHeaderValue? range)
     {
         return range != null && range.Ranges != null && range.Ranges.Count > 1;
     }
 
-    private bool IsRangeRequest(RangeHeaderValue? range)
+    private static bool IsRangeRequest(RangeHeaderValue? range)
     {
         return range != null && range.Ranges != null && range.Ranges.Count > 0;
     }
 
-    public async Task WriteVideoAsync(HttpResponse response)
+    public async Task WriteVideoAsync(HttpResponse? response)
     {
-        var bufferingFeature = response.HttpContext.Features.Get<IHttpResponseBodyFeature>();
+        var bufferingFeature = response?.HttpContext.Features.Get<IHttpResponseBodyFeature>();
         bufferingFeature?.DisableBuffering();
 
         var length = FileStream.Length;
 
-        var range = response.HttpContext.GetRanges(length);
-
-        if (IsMultipartRequest(range))
+        if (response is not null)
         {
-            response.ContentType = $"multipart/byteranges; boundary={MultipartBoundary}";
-        }
-        else
-        {
-            response.ContentType = ContentType.ToString();
-        }
-
-        response.Headers.Append("Accept-Ranges", "bytes");
-
-        if (IsRangeRequest(range))
-        {
-            response.StatusCode = (int)HttpStatusCode.PartialContent;
-
-            if (!IsMultipartRequest(range))
-            {
-                response.Headers.Append("Content-Range", $"bytes {range!.Ranges.First().From}-{range.Ranges.First().To}/{length}");
-            }
-
-            foreach (var rangeValue in range!.Ranges)
-            {
-                if (IsMultipartRequest(range)) // I don't know if multipart works
-                {
-                    await response.WriteAsync($"--{MultipartBoundary}");
-                    await response.WriteAsync(Environment.NewLine);
-                    await response.WriteAsync($"Content-type: {ContentType}");
-                    await response.WriteAsync(Environment.NewLine);
-                    await response.WriteAsync($"Content-Range: bytes {range.Ranges.First().From}-{range.Ranges.First().To}/{length}");
-                    await response.WriteAsync(Environment.NewLine);
-                }
-
-                await WriteDataToResponseBody(rangeValue, response);
-
-                if (IsMultipartRequest(range))
-                {
-                    await response.WriteAsync(Environment.NewLine);
-                }
-            }
+            var range = response.HttpContext.GetRanges(length);
 
             if (IsMultipartRequest(range))
             {
-                await response.WriteAsync($"--{MultipartBoundary}--");
-                await response.WriteAsync(Environment.NewLine);
+                response.ContentType = $"multipart/byteranges; boundary={MultipartBoundary}";
             }
-        }
-        else
-        {
-            await FileStream.CopyToAsync(response.Body);
+            else
+            {
+                response.ContentType =ContentType.ToString();
+            }
+
+            response.Headers.Append("Accept-Ranges", "bytes");
+
+            if (IsRangeRequest(range))
+            {
+                response.StatusCode = (int)HttpStatusCode.PartialContent;
+
+                if (!IsMultipartRequest(range))
+                {
+                    response.Headers.Append("Content-Range", $"bytes {range!.Ranges.First().From}-{range.Ranges.First().To}/{length}");
+                }
+
+                foreach (var rangeValue in range!.Ranges)
+                {
+                    if (IsMultipartRequest(range)) // I don't know if multipart works
+                    {
+                        await response.WriteAsync($"--{MultipartBoundary}");
+                        await response.WriteAsync(Environment.NewLine);
+                        await response.WriteAsync($"Content-type: {ContentType}");
+                        await response.WriteAsync(Environment.NewLine);
+                        await response.WriteAsync($"Content-Range: bytes {range.Ranges.First().From}-{range.Ranges.First().To}/{length}");
+                        await response.WriteAsync(Environment.NewLine);
+                    }
+
+                    await WriteDataToResponseBody(rangeValue, response);
+
+                    if (IsMultipartRequest(range))
+                    {
+                        await response.WriteAsync(Environment.NewLine);
+                    }
+                }
+
+                if (IsMultipartRequest(range))
+                {
+                    await response.WriteAsync($"--{MultipartBoundary}--");
+                    await response.WriteAsync(Environment.NewLine);
+                }
+            }
+            else
+            {
+                await FileStream.CopyToAsync(response.Body);
+            }
         }
     }
 
@@ -145,7 +144,7 @@ public static class VideoStreamResultExtensions
     {
         RangeHeaderValue? rangesResult = null;
 
-        string rangeHeader = context!.Request!.Headers!.Range!;
+        string? rangeHeader = context?.Request.Headers["Range"];
 
         if (!string.IsNullOrEmpty(rangeHeader))
         {

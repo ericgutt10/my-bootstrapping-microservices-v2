@@ -1,6 +1,7 @@
 using ApiHost;
 using ApiHost.DbContexts;
-using ApiHost.Services;
+using ApiSharedLib.Services;
+using ApiSharedLib.VideoRequests;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,15 @@ builder.Services.AddDbContext<VideoContext>(options =>
 {
     options.UseSqlite(@"Data Source=library.db");
 });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblies([
+            typeof(VideoRequest).Assembly
+            ]);
+    cfg.Lifetime = ServiceLifetime.Transient;
+});
+
 
 var app = builder.Build();
 
